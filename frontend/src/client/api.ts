@@ -19,11 +19,11 @@ export interface CreateUserRequest {
 }
 
 export interface CreateContactRequest {
-  firstName: string;
-  lastName: string;
+  first_name: string;
+  last_name: string;
   email: string;
-  phoneNumber: string;
-  userId: string;
+  phone: string;
+  user_id: string;
 }
 
 export interface UpdateContactRequest {

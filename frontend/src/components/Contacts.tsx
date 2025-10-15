@@ -5,6 +5,7 @@ import {
   parsePhoneNumber,
   useMask,
 } from "react-phone-hooks";
+import { contactApi, ApiError } from "../client/api";
 
 interface Contact {
   id: string;
@@ -58,12 +59,7 @@ export default function Contacts({ selectedUser }: ContactsProps) {
   const validatePhoneNumber = (phone: string) => {
     try {
       const parsed = parsePhoneNumber(phone);
-      return (
-        parsed &&
-        parsed.countryCode === 1 &&
-        parsed.phoneNumber &&
-        parsed.phoneNumber.length >= 10
-      );
+      return parsed && parsed.countryCode === 1 && parsed.phoneNumber;
     } catch (error) {
       return false;
     }
@@ -92,10 +88,22 @@ export default function Contacts({ selectedUser }: ContactsProps) {
       return false;
     }
 
+    // Check for duplicate email (excluding current contact if editing)
+    const duplicateEmail = contacts.find(
+      (contact) =>
+        contact.email.toLowerCase() === email.trim().toLowerCase() &&
+        (!editingContact || contact.id !== editingContact.id)
+    );
+
+    if (duplicateEmail) {
+      alert(`A contact with email "${email.trim()}" already exists.`);
+      return false;
+    }
+
     return true;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!selectedUser) {
@@ -107,7 +115,39 @@ export default function Contacts({ selectedUser }: ContactsProps) {
       return;
     }
 
-    // TODO...
+    try {
+      if (editingContact) {
+        alert("Update functionality not implemented yet");
+      } else {
+        const newContact = await contactApi.createContact({
+          first_name: formData.firstName.trim(),
+          last_name: formData.lastName.trim(),
+          email: formData.email.trim(),
+          phone: formData.phoneNumber.trim(),
+          user_id: selectedUser.id,
+        });
+
+        const contactForState: Contact = {
+          id: newContact.id,
+          firstName: newContact.firstName,
+          lastName: newContact.lastName,
+          email: newContact.email,
+          phoneNumber: newContact.phoneNumber,
+          userId: newContact.userId,
+        };
+
+        setContacts([...contacts, contactForState]);
+        alert("Contact created successfully!");
+      }
+    } catch (error) {
+      console.error("Error saving contact:", error);
+
+      if (error instanceof ApiError) {
+        alert(`Error saving contact: ${error.message}`);
+      } else {
+        alert("Failed to save contact. Please check your connection.");
+      }
+    }
 
     resetForm();
   };
