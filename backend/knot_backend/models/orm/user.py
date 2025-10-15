@@ -1,6 +1,6 @@
 from sqlalchemy import Column, String
 
-from backend.models.orm.base import BaseModel
+from knot_backend.models.orm.base import BaseModel
 
 
 class UserORM(BaseModel):

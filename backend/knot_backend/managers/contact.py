@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
-from backend.managers.base import BaseManager
-from backend.models.canonical.contact import Contact
-from backend.models.orm.contact import ContactORM
+from knot_backend.managers.base import BaseManager
+from knot_backend.models.canonical.contact import Contact
+from knot_backend.models.orm.contact import ContactORM
 
 
 class ContactManager(BaseManager[ContactORM]):

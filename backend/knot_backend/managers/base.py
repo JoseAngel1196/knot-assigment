@@ -1,5 +1,5 @@
 from typing import Generic, Type, TypeVar
-from backend.models.orm.base import BaseModel
+from knot_backend.models.orm.base import BaseModel
 
 
 ModelType = TypeVar("ModelType", bound=BaseModel)

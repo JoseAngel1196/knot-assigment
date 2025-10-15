@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from backend.schemas.base import Response
+from knot_backend.schemas.base import Response
 
 
 class UserCreate(BaseModel):
@@ -8,11 +8,11 @@ class UserCreate(BaseModel):
 
 
 class UserResponseObj(BaseModel):
-    id: str
-    username: str
+    id: str | None
+    username: str | None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class UserCreateResponse(Response[UserResponseObj]):

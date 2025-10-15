@@ -2,7 +2,7 @@ from http import HTTPStatus
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 
-from backend.api.user import router as user_router
+from knot_backend.api.user import router as user_router
 
 root_router = APIRouter()
 

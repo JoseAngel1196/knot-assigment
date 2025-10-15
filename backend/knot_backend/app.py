@@ -2,9 +2,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import create_engine
 
-from backend import settings
-from backend.api.routes import root_router
-from backend.db.connection import close_db_conn, set_db_conn
+from knot_backend import settings
+from knot_backend.api.routes import root_router
+from knot_backend.db.connection import close_db_conn, set_db_conn
 
 
 def get_app() -> FastAPI:

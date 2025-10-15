@@ -1,4 +1,4 @@
-from backend.models.canonical.base import BaseCanonicalModel
+from knot_backend.models.canonical.base import BaseCanonicalModel
 
 
 class Contact(BaseCanonicalModel):

@@ -12,3 +12,7 @@ def close_db_conn() -> None:
     global _db_conn
     if _db_conn:
         _db_conn.dispose()
+
+
+def get_db_conn() -> Database:
+    return _db_conn
