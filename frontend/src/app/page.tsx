@@ -1,15 +1,15 @@
 "use client";
 import React, { useState } from "react";
-import UserManager from "../components/user";
-import ContactsManager from "../components/contacts";
+import User from "../components/User";
+import Contact from "../components/Contacts";
 
-interface User {
+interface IUser {
   id: string;
   username: string;
 }
 
 export default function Home() {
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [selectedUser, setSelectedUser] = useState<IUser | null>(null);
 
   return (
     <div className="min-h-screen bg-gray-100 p-4 sm:p-8">
@@ -22,11 +22,11 @@ export default function Home() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div>
-            <UserManager onUserSelect={setSelectedUser} />
+            <User onUserSelect={setSelectedUser} />
           </div>
 
           <div>
-            <ContactsManager selectedUser={selectedUser} />
+            <Contact selectedUser={selectedUser} />
           </div>
         </div>
       </div>

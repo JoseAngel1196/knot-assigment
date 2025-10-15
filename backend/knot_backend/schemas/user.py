@@ -17,3 +17,7 @@ class UserResponseObj(BaseModel):
 
 class UserCreateResponse(Response[UserResponseObj]):
     pass
+
+
+class ListUsersResponse(Response[list[UserResponseObj]]):
+    pass

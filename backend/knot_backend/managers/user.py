@@ -20,5 +20,8 @@ class UserManager(BaseManager[UserORM]):
 
         return db_obj
 
+    def list_users(self, db_session: Session) -> list[UserORM]:
+        return db_session.query(self.model).all()
+
 
 user_manager = UserManager(UserORM)

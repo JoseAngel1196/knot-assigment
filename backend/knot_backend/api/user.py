@@ -4,7 +4,7 @@ from fastapi import Depends
 from knot_backend.api.deps.db import get_db
 from knot_backend.api.exceptions import UnexpectedError
 from knot_backend.logging.logger import KnotLogger
-from knot_backend.schemas.user import UserCreate, UserCreateResponse
+from knot_backend.schemas.user import ListUsersResponse, UserCreate, UserCreateResponse
 from knot_backend.managers.user import user_manager
 
 _LOGGER = KnotLogger(__name__)
@@ -28,3 +28,9 @@ def create_user(obj_in: UserCreate, db_session=Depends(get_db)) -> UserCreateRes
     db_session.commit()
 
     return UserCreateResponse(data=user)
+
+
+@router.get("/", response_model=ListUsersResponse)
+def list_users(db_session=Depends(get_db)) -> ListUsersResponse:
+    users = user_manager.list_users(db_session)
+    return ListUsersResponse(data=users)

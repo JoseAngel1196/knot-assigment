@@ -8,8 +8,6 @@ interface Contact {
   email: string;
   phoneNumber: string;
   userId: string;
-  createdAt: Date;
-  updatedAt: Date;
 }
 
 interface User {
@@ -212,12 +210,6 @@ export default function Contacts({ selectedUser }: ContactsProps) {
                     </h4>
                     <p className="text-gray-600">{contact.email}</p>
                     <p className="text-gray-600">{contact.phoneNumber}</p>
-                    <div className="text-sm text-gray-500 mt-2">
-                      <p>Created: {contact.createdAt.toLocaleString()}</p>
-                      {contact.updatedAt > contact.createdAt && (
-                        <p>Updated: {contact.updatedAt.toLocaleString()}</p>
-                      )}
-                    </div>
                   </div>
                   <div className="flex gap-2 ml-4">
                     <button
