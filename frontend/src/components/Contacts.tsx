@@ -34,6 +34,8 @@ export default function Contacts({ selectedUser }: ContactsProps) {
     phoneNumber: "",
   });
 
+  const phoneMaskProps = useMask("+1 (...) ... ....");
+
   const userContacts = selectedUser
     ? contacts.filter((contact) => contact.userId === selectedUser.id)
     : [];
@@ -157,7 +159,7 @@ export default function Contacts({ selectedUser }: ContactsProps) {
             onChange={(e) =>
               setFormData({ ...formData, firstName: e.target.value })
             }
-            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-500"
           />
           <input
             type="text"
@@ -166,7 +168,7 @@ export default function Contacts({ selectedUser }: ContactsProps) {
             onChange={(e) =>
               setFormData({ ...formData, lastName: e.target.value })
             }
-            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-500"
           />
         </div>
 
@@ -178,17 +180,17 @@ export default function Contacts({ selectedUser }: ContactsProps) {
             onChange={(e) =>
               setFormData({ ...formData, email: e.target.value })
             }
-            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-500"
           />
           <input
             type="tel"
-            placeholder="Phone Number *"
+            placeholder="Phone Number * (e.g., +1 (555) 123 4567)"
             value={formData.phoneNumber}
             onChange={(e) =>
               setFormData({ ...formData, phoneNumber: e.target.value })
             }
-            {...useMask("+1 (...) ... ....")}
-            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            {...phoneMaskProps}
+            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-500"
           />
         </div>
 
