@@ -35,14 +35,3 @@ def get_app() -> FastAPI:
 
 
 app = get_app()
-
-
-if __name__ == "__main__":
-    import uvicorn
-
-    uvicorn.run(
-        "klevrpay_agents.app:app",
-        host="0.0.0.0",  # type: ignore
-        port=int(settings.PORT),
-        log_level="info",
-    )
