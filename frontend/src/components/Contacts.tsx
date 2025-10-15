@@ -1,5 +1,10 @@
 "use client";
 import React, { useState } from "react";
+import {
+  getFormattedNumber,
+  parsePhoneNumber,
+  useMask,
+} from "react-phone-hooks";
 
 interface Contact {
   id: string;
@@ -29,7 +34,6 @@ export default function Contacts({ selectedUser }: ContactsProps) {
     phoneNumber: "",
   });
 
-  // Filter contacts for the selected user
   const userContacts = selectedUser
     ? contacts.filter((contact) => contact.userId === selectedUser.id)
     : [];
@@ -49,6 +53,20 @@ export default function Contacts({ selectedUser }: ContactsProps) {
     return emailRegex.test(email);
   };
 
+  const validatePhoneNumber = (phone: string) => {
+    try {
+      const parsed = parsePhoneNumber(phone);
+      return (
+        parsed &&
+        parsed.countryCode === 1 &&
+        parsed.phoneNumber &&
+        parsed.phoneNumber.length >= 10
+      );
+    } catch (error) {
+      return false;
+    }
+  };
+
   const validateForm = () => {
     const { firstName, lastName, email, phoneNumber } = formData;
 
@@ -64,6 +82,11 @@ export default function Contacts({ selectedUser }: ContactsProps) {
 
     if (!validateEmail(email)) {
       alert("Please enter a valid email address");
+      return false;
+    }
+
+    if (!validatePhoneNumber(phoneNumber)) {
+      alert("Please enter a valid US phone number");
       return false;
     }
 
@@ -164,6 +187,7 @@ export default function Contacts({ selectedUser }: ContactsProps) {
             onChange={(e) =>
               setFormData({ ...formData, phoneNumber: e.target.value })
             }
+            {...useMask("+1 (...) ... ....")}
             className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
