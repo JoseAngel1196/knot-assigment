@@ -6,3 +6,4 @@ class Contact(BaseCanonicalModel):
     last_name: str
     email: str
     phone: str
+    user_id: str

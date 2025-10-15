@@ -3,6 +3,7 @@ from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 
 from knot_backend.api.user import router as user_router
+from knot_backend.api.contact import router as contact_router
 
 root_router = APIRouter()
 
@@ -13,3 +14,4 @@ def health_check():
 
 
 root_router.include_router(user_router, prefix="/users")
+root_router.include_router(contact_router, prefix="/contacts")

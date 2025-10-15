@@ -1,6 +1,5 @@
 from sqlalchemy.orm import Session
 
-
 from knot_backend.managers.base import BaseManager
 from knot_backend.models.canonical.user import User
 from knot_backend.models.orm.user import UserORM

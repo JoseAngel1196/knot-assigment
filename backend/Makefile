@@ -17,7 +17,7 @@ create-db:
 	psql postgres -tc "SELECT 1 FROM pg_database WHERE datname = '${service_name}'" | grep -q 1 || psql postgres -c "CREATE DATABASE ${service_name} OWNER knot"
 
 .PHONY: db
-db: create-db-users create-db
+db: create-db-users create-db upgrade-db
 
 .PHONY: alembic-migration
 alembic-migration:
