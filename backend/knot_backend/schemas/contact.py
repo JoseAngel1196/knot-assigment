@@ -27,5 +27,9 @@ class ContactCreate(Contact):
     user_id: uuid.UUID
 
 
+class ContactUpdate(Contact):
+    user_id: uuid.UUID
+
+
 class ListContactsResponse(Response[list[ContactBaseResponseObj]]):
     pass

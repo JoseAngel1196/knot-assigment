@@ -37,5 +37,32 @@ class ContactManager(BaseManager[ContactORM]):
 
         return db_obj
 
+    def update_contact(
+        self, db_session: Session, contact_id: str, contact: Contact
+    ) -> ContactORM | None:
+        db_obj = self.get(db_session, contact_id)
+        if not db_obj:
+            return None
+
+        db_obj.first_name = contact.first_name
+        db_obj.last_name = contact.last_name
+        db_obj.email = contact.email
+        db_obj.phone = contact.phone
+
+        db_session.add(db_obj)
+        db_session.flush()
+
+        return db_obj
+
+    def delete_contact(self, db_session: Session, contact_id: str) -> None:
+        db_obj = self.get(db_session, contact_id)
+        if not db_obj:
+            return None
+
+        db_session.delete(db_obj)
+        db_session.flush()
+
+        return None
+
 
 contact_manager = ContactManager(ContactORM)
