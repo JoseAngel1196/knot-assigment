@@ -1,12 +1,9 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { parsePhoneNumber, useMask } from "react-phone-hooks";
-import {
-  contactApi,
-  ApiError,
-  type Contact,
-  type ContactHistory,
-} from "../client/api";
+import { contactApi, ApiError, type Contact } from "../client/api";
+
+const POLLING_INTERVAL_TWO_SECONDS = 2000;
 
 interface User {
   id: string;
@@ -40,6 +37,25 @@ export default function Contacts({ selectedUser }: ContactsProps) {
     } else {
       setContacts([]);
     }
+  }, [selectedUser]);
+
+  useEffect(() => {
+    if (!selectedUser) return;
+
+    const pollContacts = async () => {
+      try {
+        const mappedContacts = await contactApi.getContactsByUserId(
+          selectedUser.id
+        );
+        setContacts(mappedContacts);
+      } catch (error) {
+        console.error("Error polling contacts:", error);
+      }
+    };
+
+    const intervalId = setInterval(pollContacts, POLLING_INTERVAL_TWO_SECONDS);
+
+    return () => clearInterval(intervalId);
   }, [selectedUser]);
 
   const fetchContactsForUser = async (userId: string) => {

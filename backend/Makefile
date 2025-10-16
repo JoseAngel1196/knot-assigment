@@ -6,7 +6,7 @@ lint:
 
 .PHONY: server-reload
 server-reload:
-	poetry run uvicorn --reload ${service_name}.app:app --host 0.0.0.0 --port 3000
+	poetry run uvicorn --reload ${service_name}.app:app --host 0.0.0.0 --port 8000
 
 .PHONY: create-db-users
 create-db-users:
