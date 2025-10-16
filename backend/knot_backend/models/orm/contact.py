@@ -17,5 +17,6 @@ class ContactORM(BaseModel):
     contact_histories = relationship(
         "ContactHistoryORM",
         back_populates="contact",
-        innerjoin=True,
+        cascade="all, delete-orphan",
+        passive_deletes=True,
     )
