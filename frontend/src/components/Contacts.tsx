@@ -195,9 +195,24 @@ export default function Contacts({ selectedUser }: ContactsProps) {
     });
   };
 
-  const handleDelete = (contactId: string) => {
+  const handleDelete = async (contactId: string) => {
     if (confirm("Are you sure you want to delete this contact?")) {
-      // TODO...
+      try {
+        await contactApi.deleteContact(contactId);
+        alert("Contact deleted successfully!");
+
+        if (selectedUser) {
+          await fetchContactsForUser(selectedUser.id);
+        }
+      } catch (error) {
+        console.error("Error deleting contact:", error);
+
+        if (error instanceof ApiError) {
+          alert(`Error deleting contact: ${error.message}`);
+        } else {
+          alert("Failed to delete contact. Please check your connection.");
+        }
+      }
     }
   };
 
@@ -286,20 +301,9 @@ export default function Contacts({ selectedUser }: ContactsProps) {
       </form>
 
       <div>
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold text-gray-700">
-            Contacts ({userContacts.length})
-          </h3>
-          {selectedUser && (
-            <button
-              onClick={() => fetchContactsForUser(selectedUser.id)}
-              disabled={loading}
-              className="px-3 py-1 text-sm bg-gray-500 text-white rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors disabled:opacity-50"
-            >
-              {loading ? "Loading..." : "Refresh"}
-            </button>
-          )}
-        </div>
+        <h3 className="text-lg font-semibold mb-4 text-gray-700">
+          Contacts ({userContacts.length})
+        </h3>
 
         {loading ? (
           <div className="flex items-center justify-center py-8">

@@ -100,16 +100,7 @@ export default function User({ onUserSelect }: UserProps) {
       </div>
 
       <div>
-        <div className="flex justify-between items-center mb-3">
-          <h3 className="text-lg font-semibold text-gray-700">Select a user</h3>
-          <button
-            onClick={fetchUsers}
-            disabled={loading}
-            className="px-3 py-1 text-sm bg-gray-500 text-white rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors disabled:opacity-50"
-          >
-            {loading ? "Loading..." : "Refresh"}
-          </button>
-        </div>
+        <h3 className="text-lg font-semibold mb-3 text-gray-700">Select a user</h3>
 
         {loading ? (
           <div className="flex items-center justify-center py-8">
