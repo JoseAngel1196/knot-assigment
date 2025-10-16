@@ -27,10 +27,11 @@ export interface CreateContactRequest {
 }
 
 export interface UpdateContactRequest {
-  firstName?: string;
-  lastName?: string;
+  first_name?: string;
+  last_name?: string;
   email?: string;
-  phoneNumber?: string;
+  phone?: string;
+  user_id?: string;
 }
 
 export interface ApiResponse<T> {
@@ -120,10 +121,11 @@ export const contactApi = {
     id: string,
     contactData: UpdateContactRequest
   ): Promise<Contact> {
-    return apiRequest<Contact>(`/contacts/${id}`, {
+    const response = await apiRequest<ApiResponse<Contact>>(`/contacts/${id}`, {
       method: "PUT",
       body: JSON.stringify(contactData),
     });
+    return response.data;
   },
 
   async deleteContact(id: string): Promise<void> {

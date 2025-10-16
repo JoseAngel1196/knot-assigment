@@ -1,10 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import {
-  getFormattedNumber,
-  parsePhoneNumber,
-  useMask,
-} from "react-phone-hooks";
+import { parsePhoneNumber, useMask } from "react-phone-hooks";
 import { contactApi, ApiError } from "../client/api";
 
 interface Contact {
@@ -28,6 +24,7 @@ interface ContactsProps {
 export default function Contacts({ selectedUser }: ContactsProps) {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [editingContact, setEditingContact] = useState<Contact | null>(null);
+  const [editingContactId, setEditingContactId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
@@ -50,8 +47,17 @@ export default function Contacts({ selectedUser }: ContactsProps) {
     try {
       setLoading(true);
       const userContacts = await contactApi.getContactsByUserId(userId);
-      console.log("Fetched contacts:", userContacts);
-      setContacts(userContacts);
+
+      const mappedContacts = userContacts.map((contact: any) => ({
+        id: contact.id,
+        firstName: contact.firstName || contact.first_name || "",
+        lastName: contact.lastName || contact.last_name || "",
+        email: contact.email || "",
+        phoneNumber: contact.phoneNumber || contact.phone || "",
+        userId: contact.userId || contact.user_id || "",
+      }));
+
+      setContacts(mappedContacts);
     } catch (error) {
       console.error("Error fetching contacts:", error);
       if (error instanceof ApiError) {
@@ -74,6 +80,7 @@ export default function Contacts({ selectedUser }: ContactsProps) {
       phoneNumber: "",
     });
     setEditingContact(null);
+    setEditingContactId(null);
   };
 
   const validateEmail = (email: string) => {
@@ -113,7 +120,7 @@ export default function Contacts({ selectedUser }: ContactsProps) {
       return false;
     }
 
-    // Check for duplicate email (excluding current contact if editing)
+    // Check for duplicate email
     const duplicateEmail = contacts.find(
       (contact) =>
         contact.email.toLowerCase() === email.trim().toLowerCase() &&
@@ -141,10 +148,8 @@ export default function Contacts({ selectedUser }: ContactsProps) {
     }
 
     try {
-      if (editingContact) {
-        alert("Update functionality not implemented yet");
-      } else {
-        const newContact = await contactApi.createContact({
+      if (editingContactId) {
+        await contactApi.updateContact(editingContactId, {
           first_name: formData.firstName.trim(),
           last_name: formData.lastName.trim(),
           email: formData.email.trim(),
@@ -152,17 +157,19 @@ export default function Contacts({ selectedUser }: ContactsProps) {
           user_id: selectedUser.id,
         });
 
-        const contactForState: Contact = {
-          id: newContact.id,
-          firstName: newContact.firstName,
-          lastName: newContact.lastName,
-          email: newContact.email,
-          phoneNumber: newContact.phoneNumber,
-          userId: newContact.userId,
-        };
+        alert("Contact updated successfully!");
+        await fetchContactsForUser(selectedUser.id);
+      } else {
+        await contactApi.createContact({
+          first_name: formData.firstName.trim(),
+          last_name: formData.lastName.trim(),
+          email: formData.email.trim(),
+          phone: formData.phoneNumber.trim(),
+          user_id: selectedUser.id,
+        });
 
-        setContacts([...contacts, contactForState]);
         alert("Contact created successfully!");
+        await fetchContactsForUser(selectedUser.id);
       }
     } catch (error) {
       console.error("Error saving contact:", error);
@@ -179,11 +186,12 @@ export default function Contacts({ selectedUser }: ContactsProps) {
 
   const handleEdit = (contact: Contact) => {
     setEditingContact(contact);
+    setEditingContactId(contact.id);
     setFormData({
-      firstName: contact.firstName,
-      lastName: contact.lastName,
-      email: contact.email,
-      phoneNumber: contact.phoneNumber,
+      firstName: contact.firstName || (contact as any).first_name || "",
+      lastName: contact.lastName || (contact as any).last_name || "",
+      email: contact.email || "",
+      phoneNumber: contact.phoneNumber || (contact as any).phone || "",
     });
   };
 
@@ -212,7 +220,7 @@ export default function Contacts({ selectedUser }: ContactsProps) {
 
       <form onSubmit={handleSubmit} className="mb-8 bg-gray-50 p-4 rounded-lg">
         <h3 className="text-lg font-semibold mb-4 text-gray-700">
-          {editingContact ? "Edit Contact" : "Add New Contact"}
+          {editingContactId ? "Edit Contact" : "Add New Contact"}
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -263,9 +271,9 @@ export default function Contacts({ selectedUser }: ContactsProps) {
             type="submit"
             className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
           >
-            {editingContact ? "Update Contact" : "Add Contact"}
+            {editingContactId ? "Update Contact" : "Add Contact"}
           </button>
-          {editingContact && (
+          {editingContactId && (
             <button
               type="button"
               onClick={resetForm}
