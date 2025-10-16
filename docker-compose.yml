@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: knot-postgres
+    environment:
+      POSTGRES_DB: knot_backend
+      POSTGRES_USER: knot
+      POSTGRES_PASSWORD: knot_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U knot -d knot_backend"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - knot-network
+
+  backend:
+    build: ./backend
+    container_name: knot-backend
+    environment:
+      DATABASE_URL: postgresql://knot:knot_password@postgres:5432/knot_backend
+      PORT: 8080
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./backend/alembic:/knot-backend/alembic
+      - ./backend/knot_backend:/knot-backend/knot_backend
+    command: >
+      sh -c "
+        echo 'Waiting for database to be ready...' &&
+        poetry run alembic upgrade head &&
+        echo 'Database migrations completed. Starting server...' &&
+        poetry run uvicorn knot_backend.app:app --host 0.0.0.0 --port 8080 --timeout-keep-alive 625 --workers 2 --loop uvloop --header server:TI-84 --no-access-log
+      "
+    networks:
+      - knot-network
+
+  frontend:
+    build: ./frontend
+    container_name: knot-frontend
+    environment:
+      NEXT_PUBLIC_API_URL: http://backend:8080
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+    networks:
+      - knot-network
+
+volumes:
+  postgres_data:
+
+networks:
+  knot-network:
+    driver: bridge

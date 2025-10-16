@@ -51,11 +51,11 @@ export default function User({ onUserSelect }: UserProps) {
     }
 
     try {
-      const newUser = await userApi.createUser({
+      await userApi.createUser({
         username: newUsername.trim(),
       });
 
-      setUsers([...users, newUser]);
+      await fetchUsers();
       setNewUsername("");
       alert("User created successfully!");
     } catch (error) {
@@ -100,7 +100,9 @@ export default function User({ onUserSelect }: UserProps) {
       </div>
 
       <div>
-        <h3 className="text-lg font-semibold mb-3 text-gray-700">Select a user</h3>
+        <h3 className="text-lg font-semibold mb-3 text-gray-700">
+          Select a user
+        </h3>
 
         {loading ? (
           <div className="flex items-center justify-center py-8">
