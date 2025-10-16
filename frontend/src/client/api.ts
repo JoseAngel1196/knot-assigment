@@ -5,6 +5,12 @@ export interface User {
   username: string;
 }
 
+export interface ContactHistory {
+  field_changed: string;
+  old_value: string;
+  new_value: string;
+}
+
 export interface Contact {
   id: string;
   firstName: string;
@@ -12,6 +18,17 @@ export interface Contact {
   email: string;
   phoneNumber: string;
   userId: string;
+  contact_histories?: ContactHistory[];
+}
+
+export interface BackendContact {
+  id: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone: string;
+  user_id: string;
+  contact_histories?: ContactHistory[];
 }
 
 export interface CreateUserRequest {
@@ -113,8 +130,19 @@ export const contactApi = {
   },
 
   async getContactsByUserId(userId: string): Promise<Contact[]> {
-    const response = await apiRequest<ApiResponse<Contact[]>>(`/contacts/user/${userId}`);
-    return response.data;
+    const response = await apiRequest<ApiResponse<BackendContact[]>>(
+      `/contacts/user/${userId}`
+    );
+
+    return response.data.map((contact) => ({
+      id: contact.id,
+      firstName: contact.first_name,
+      lastName: contact.last_name,
+      email: contact.email,
+      phoneNumber: contact.phone,
+      userId: contact.user_id,
+      contact_histories: contact.contact_histories || [],
+    }));
   },
 
   async updateContact(

@@ -1,16 +1,12 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { parsePhoneNumber, useMask } from "react-phone-hooks";
-import { contactApi, ApiError } from "../client/api";
-
-interface Contact {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phoneNumber: string;
-  userId: string;
-}
+import {
+  contactApi,
+  ApiError,
+  type Contact,
+  type ContactHistory,
+} from "../client/api";
 
 interface User {
   id: string;
@@ -26,6 +22,9 @@ export default function Contacts({ selectedUser }: ContactsProps) {
   const [editingContact, setEditingContact] = useState<Contact | null>(null);
   const [editingContactId, setEditingContactId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [expandedHistories, setExpandedHistories] = useState<Set<string>>(
+    new Set()
+  );
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -46,17 +45,7 @@ export default function Contacts({ selectedUser }: ContactsProps) {
   const fetchContactsForUser = async (userId: string) => {
     try {
       setLoading(true);
-      const userContacts = await contactApi.getContactsByUserId(userId);
-
-      const mappedContacts = userContacts.map((contact: any) => ({
-        id: contact.id,
-        firstName: contact.firstName || contact.first_name || "",
-        lastName: contact.lastName || contact.last_name || "",
-        email: contact.email || "",
-        phoneNumber: contact.phoneNumber || contact.phone || "",
-        userId: contact.userId || contact.user_id || "",
-      }));
-
+      const mappedContacts = await contactApi.getContactsByUserId(userId);
       setContacts(mappedContacts);
     } catch (error) {
       console.error("Error fetching contacts:", error);
@@ -94,6 +83,35 @@ export default function Contacts({ selectedUser }: ContactsProps) {
       return parsed && parsed.countryCode === 1 && parsed.phoneNumber;
     } catch (error) {
       return false;
+    }
+  };
+
+  const toggleHistory = (contactId: string) => {
+    setExpandedHistories((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(contactId)) {
+        newSet.delete(contactId);
+      } else {
+        newSet.add(contactId);
+      }
+      return newSet;
+    });
+  };
+
+  const formatFieldName = (fieldName: string) => {
+    switch (fieldName) {
+      case "first_name":
+        return "First Name";
+      case "last_name":
+        return "Last Name";
+      case "email":
+        return "Email";
+      case "phone":
+        return "Phone Number";
+      default:
+        return fieldName
+          .replace(/_/g, " ")
+          .replace(/\b\w/g, (l) => l.toUpperCase());
     }
   };
 
@@ -188,10 +206,10 @@ export default function Contacts({ selectedUser }: ContactsProps) {
     setEditingContact(contact);
     setEditingContactId(contact.id);
     setFormData({
-      firstName: contact.firstName || (contact as any).first_name || "",
-      lastName: contact.lastName || (contact as any).last_name || "",
-      email: contact.email || "",
-      phoneNumber: contact.phoneNumber || (contact as any).phone || "",
+      firstName: contact.firstName,
+      lastName: contact.lastName,
+      email: contact.email,
+      phoneNumber: contact.phoneNumber,
     });
   };
 
@@ -329,6 +347,16 @@ export default function Contacts({ selectedUser }: ContactsProps) {
                     <p className="text-gray-600">{contact.phoneNumber}</p>
                   </div>
                   <div className="flex gap-2 ml-4">
+                    {contact.contact_histories &&
+                      contact.contact_histories.length > 0 && (
+                        <button
+                          onClick={() => toggleHistory(contact.id)}
+                          className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors text-sm"
+                        >
+                          {expandedHistories.has(contact.id) ? "Hide" : "Show"}{" "}
+                          History ({contact.contact_histories.length})
+                        </button>
+                      )}
                     <button
                       onClick={() => handleEdit(contact)}
                       className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition-colors text-sm"
@@ -343,6 +371,47 @@ export default function Contacts({ selectedUser }: ContactsProps) {
                     </button>
                   </div>
                 </div>
+
+                {/* Contact History Section */}
+                {expandedHistories.has(contact.id) &&
+                  contact.contact_histories &&
+                  contact.contact_histories.length > 0 && (
+                    <div className="mt-4 pt-4 border-t border-gray-200">
+                      <h5 className="text-sm font-semibold text-gray-700 mb-3">
+                        Edit History
+                      </h5>
+                      <div className="space-y-2 max-h-48 overflow-y-auto">
+                        {contact.contact_histories.map((history, index) => (
+                          <div
+                            key={index}
+                            className="bg-gray-50 rounded p-3 text-sm"
+                          >
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="font-medium text-gray-700">
+                                {formatFieldName(history.field_changed)}
+                              </span>
+                            </div>
+                            <div className="space-y-1">
+                              <div className="flex items-center">
+                                <span className="text-gray-500 mr-2">
+                                  From:
+                                </span>
+                                <span className="text-red-600 bg-red-50 px-2 py-1 rounded text-xs">
+                                  {history.old_value || "(empty)"}
+                                </span>
+                              </div>
+                              <div className="flex items-center">
+                                <span className="text-gray-500 mr-2">To:</span>
+                                <span className="text-green-600 bg-green-50 px-2 py-1 rounded text-xs">
+                                  {history.new_value}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
               </div>
             ))}
           </div>
