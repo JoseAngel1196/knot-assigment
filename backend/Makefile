@@ -28,3 +28,15 @@ alembic-migration:
 .PHONY: upgrade-db
 upgrade-db:
 	poetry run alembic upgrade head
+
+.PHONY: docker-up
+docker-up:
+	docker compose up --build
+
+.PHONY: docker-up-detached
+docker-up-detached:
+	docker compose up --build -d
+
+.PHONY: docker-down
+docker-down:
+	docker compose down
