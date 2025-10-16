@@ -25,6 +25,7 @@ def get_contacts_by_user(
 ) -> ListContactsResponse:
     try:
         contacts = contact_manager.get_contacts_by_user(db_session, user_id)
+        
     except Exception as exc:
         _LOGGER.error(f"Error retrieving contacts for user {user_id}: {exc}")
         raise UnexpectedError()

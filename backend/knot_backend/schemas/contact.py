@@ -1,8 +1,16 @@
 from typing import Optional
 import uuid
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from knot_backend.schemas.base import Response
+
+
+class ContactHistory(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    field_changed: str
+    old_value: Optional[str]
+    new_value: Optional[str]
 
 
 class Contact(BaseModel):
@@ -13,10 +21,15 @@ class Contact(BaseModel):
 
 
 class ContactBaseResponseObj(Contact):
+    model_config = ConfigDict(from_attributes=True)
+
     id: Optional[uuid.UUID]
 
-    class Config:
-        from_attributes = True
+
+class ContactListResponseObj(ContactBaseResponseObj):
+    model_config = ConfigDict(from_attributes=True)
+
+    contact_histories: Optional[list[ContactHistory]] = []
 
 
 class ContactResponse(Response[ContactBaseResponseObj]):
@@ -31,5 +44,5 @@ class ContactUpdate(Contact):
     user_id: uuid.UUID
 
 
-class ListContactsResponse(Response[list[ContactBaseResponseObj]]):
+class ListContactsResponse(Response[list[ContactListResponseObj]]):
     pass
