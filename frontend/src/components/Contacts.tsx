@@ -269,13 +269,13 @@ export default function Contacts({ selectedUser }: ContactsProps) {
 
       <form onSubmit={handleSubmit} className="mb-8 bg-gray-50 p-4 rounded-lg">
         <h3 className="text-lg font-semibold mb-4 text-gray-700">
-          {editingContactId ? "Edit Contact" : "Add New Contact"}
+          {editingContactId ? "Edit contact" : "Add new contact"}
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <input
             type="text"
-            placeholder="First Name *"
+            placeholder="First Name"
             value={formData.firstName}
             onChange={(e) =>
               setFormData({ ...formData, firstName: e.target.value })
@@ -284,7 +284,7 @@ export default function Contacts({ selectedUser }: ContactsProps) {
           />
           <input
             type="text"
-            placeholder="Last Name *"
+            placeholder="Last Name"
             value={formData.lastName}
             onChange={(e) =>
               setFormData({ ...formData, lastName: e.target.value })
@@ -296,7 +296,7 @@ export default function Contacts({ selectedUser }: ContactsProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <input
             type="email"
-            placeholder="Email *"
+            placeholder="Email"
             value={formData.email}
             onChange={(e) =>
               setFormData({ ...formData, email: e.target.value })
@@ -305,7 +305,7 @@ export default function Contacts({ selectedUser }: ContactsProps) {
           />
           <input
             type="tel"
-            placeholder="Phone Number * (e.g., +1 (555) 123 4567)"
+            placeholder="Phone Number"
             value={formData.phoneNumber}
             onChange={(e) =>
               setFormData({ ...formData, phoneNumber: e.target.value })
@@ -336,7 +336,7 @@ export default function Contacts({ selectedUser }: ContactsProps) {
 
       <div>
         <h3 className="text-lg font-semibold mb-4 text-gray-700">
-          Contacts ({userContacts.length})
+          All contacts ({userContacts.length})
         </h3>
 
         {loading ? (
