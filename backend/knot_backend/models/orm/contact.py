@@ -13,3 +13,9 @@ class ContactORM(BaseModel):
     user_id = Column(String, ForeignKey("users.id"), nullable=False)
 
     user = relationship("UserORM", foreign_keys=[user_id], innerjoin=True)
+
+    contact_histories = relationship(
+        "ContactHistoryORM",
+        back_populates="contact",
+        innerjoin=True,
+    )

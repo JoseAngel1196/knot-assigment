@@ -14,3 +14,8 @@ class UserORM(BaseModel):
         back_populates="user",
         innerjoin=True,
     )
+    contact_histories = relationship(
+        "ContactHistoryORM",
+        back_populates="user",
+        innerjoin=True,
+    )
