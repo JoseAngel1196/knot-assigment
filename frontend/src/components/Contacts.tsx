@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   getFormattedNumber,
   parsePhoneNumber,
@@ -28,6 +28,7 @@ interface ContactsProps {
 export default function Contacts({ selectedUser }: ContactsProps) {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [editingContact, setEditingContact] = useState<Contact | null>(null);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -37,9 +38,33 @@ export default function Contacts({ selectedUser }: ContactsProps) {
 
   const phoneMaskProps = useMask("+1 (...) ... ....");
 
-  const userContacts = selectedUser
-    ? contacts.filter((contact) => contact.userId === selectedUser.id)
-    : [];
+  useEffect(() => {
+    if (selectedUser) {
+      fetchContactsForUser(selectedUser.id);
+    } else {
+      setContacts([]);
+    }
+  }, [selectedUser]);
+
+  const fetchContactsForUser = async (userId: string) => {
+    try {
+      setLoading(true);
+      const userContacts = await contactApi.getContactsByUserId(userId);
+      console.log("Fetched contacts:", userContacts);
+      setContacts(userContacts);
+    } catch (error) {
+      console.error("Error fetching contacts:", error);
+      if (error instanceof ApiError) {
+        alert(`Error fetching contacts: ${error.message}`);
+      } else {
+        alert("Failed to fetch contacts. Please check your connection.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const userContacts = contacts;
 
   const resetForm = () => {
     setFormData({
@@ -185,7 +210,6 @@ export default function Contacts({ selectedUser }: ContactsProps) {
         Contacts for {selectedUser.username}
       </h2>
 
-      {/* Contact Form */}
       <form onSubmit={handleSubmit} className="mb-8 bg-gray-50 p-4 rounded-lg">
         <h3 className="text-lg font-semibold mb-4 text-gray-700">
           {editingContact ? "Edit Contact" : "Add New Contact"}
@@ -254,13 +278,28 @@ export default function Contacts({ selectedUser }: ContactsProps) {
       </form>
 
       <div>
-        <h3 className="text-lg font-semibold mb-4 text-gray-700">
-          Contacts ({userContacts.length})
-        </h3>
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-semibold text-gray-700">
+            Contacts ({userContacts.length})
+          </h3>
+          {selectedUser && (
+            <button
+              onClick={() => fetchContactsForUser(selectedUser.id)}
+              disabled={loading}
+              className="px-3 py-1 text-sm bg-gray-500 text-white rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors disabled:opacity-50"
+            >
+              {loading ? "Loading..." : "Refresh"}
+            </button>
+          )}
+        </div>
 
-        {userContacts.length === 0 ? (
+        {loading ? (
+          <div className="flex items-center justify-center py-8">
+            <div className="text-gray-500">Loading contacts...</div>
+          </div>
+        ) : userContacts.length === 0 ? (
           <p className="text-gray-500 italic">
-            No contacts created yet for this user.
+            No contacts found for this user.
           </p>
         ) : (
           <div className="grid gap-4">

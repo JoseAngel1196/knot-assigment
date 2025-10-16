@@ -100,10 +100,11 @@ export const userApi = {
 
 export const contactApi = {
   async createContact(contactData: CreateContactRequest): Promise<Contact> {
-    return apiRequest<Contact>("/contacts/", {
+    const response = await apiRequest<ApiResponse<Contact>>("/contacts/", {
       method: "POST",
       body: JSON.stringify(contactData),
     });
+    return response.data;
   },
 
   async getContacts(): Promise<Contact[]> {
@@ -111,7 +112,8 @@ export const contactApi = {
   },
 
   async getContactsByUserId(userId: string): Promise<Contact[]> {
-    return apiRequest<Contact[]>(`/contacts/user/${userId}`);
+    const response = await apiRequest<ApiResponse<Contact[]>>(`/contacts/user/${userId}`);
+    return response.data;
   },
 
   async updateContact(
